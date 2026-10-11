@@ -1,0 +1,44 @@
+# ==============================================================================
+# .gitignore for marble-kernel-susfs
+# ==============================================================================
+
+# Build directories and cloned kernel trees (multi-GB)
+build_env/
+out/
+*.o
+*.cmd
+*.ko
+*.mod
+*.mod.c
+modules.order
+Module.symvers
+
+# Crash dumps and logs
+*.log
+mtdoops*.log
+pstore*
+
+# Temporary unpacking files
+kernel
+header
+ramdisk.cpio
+
+# Binary images larger than GitHub limit (100MB)
+# Note: Release binaries in output/ should be published via GitHub Releases!
+*.img
+stock_boot/*.img
+output/*.img
+output/*.zip
+
+# Keep essential output tracking
+!output/SHA256SUMS
+!output/.gitkeep
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
