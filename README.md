@@ -1,4 +1,6 @@
-# 🚀 POCO F5 (`marble`) — Ядро LineageOS 23.2 (Android 16) з KernelSU-Next & SUSFS
+# POCO F5 (`marble`) — LineageOS 23.2 (Android 16) Kernel with KernelSU-Next & SUSFS
+
+**English** | [Українська](README_UA.md)
 
 [![Android](https://img.shields.io/badge/Android-16%20(Baklava)-3DDC84?logo=android&logoColor=white)](https://android.com)
 [![LineageOS](https://img.shields.io/badge/LineageOS-23.2%20Nightly-167C80?logo=lineageos&logoColor=white)](https://lineageos.org)
@@ -7,17 +9,17 @@
 [![KernelSU-Next](https://img.shields.io/badge/KernelSU--Next-v3.4.1%20(33345--5)-success)](https://github.com/KernelSU-Next/KernelSU-Next)
 [![SUSFS](https://img.shields.io/badge/SUSFS-v2.3.0%20(9%20Features)-blueviolet)](https://gitlab.com/simonpunk/susfs4ksu)
 [![License](https://img.shields.io/badge/License-GPL--2.0-yellow.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-100%25%20Tested%20%26%20Working-brightgreen)](#-перевірка-та-скріншоти)
+[![Status](https://img.shields.io/badge/Status-Verified%20on%20Hardware-brightgreen)](#-hardware-verification)
 
-Офіційне джерело та набір інструментів для збірки й встановлення оптимізованого ядра **Linux GKI 5.10.269** для **Xiaomi POCO F5 / Redmi Note 12 Turbo (`marble` / `marblein`)** на базі **LineageOS 23.2 (Android 16)** з повною нативною підтримкою **KernelSU-Next v3.4.1** та модуля **SUSFS v2.3.0**.
+Source tree, build configurations, and packaging automation for **Linux GKI 5.10.269** targeting the **Xiaomi POCO F5 / Redmi Note 12 Turbo (`marble` / `marblein`)** on **LineageOS 23.2 (Android 16)**. Features integrated **KernelSU-Next v3.4.1** and **SUSFS v2.3.0** with strict Qualcomm vendor DLKM ABI compatibility and Android Verified Boot (AVB) signing.
 
-> 💡 **Детальний технічний розбір усіх помилок, аналіз бутлупів, ABI та AVB доступний у файлі [roadmap.md](roadmap.md)**.
+> Technical analysis of bootloops, DLKM symbol versioning, struct page memory corruption, and AVB descriptor alignment is documented in [roadmap.md](roadmap.md).
 
 ---
 
-## 📸 Перевірка та скріншоти
+## 📸 Hardware Verification
 
-Ядро успішно протестоване на реальному смартфоні **POCO F5 (marble)** під керуванням офіційного білду `lineage-23.2-20261006-NIGHTLY-marble`. Усі 9 модулів Magisk/Zygisk активні, режим зворотної сумісності `sucompat` активований, попередження про несумісність ядра відсутні.
+Tested on physical hardware (**POCO F5 `marble`**) running official build `lineage-23.2-20261006-NIGHTLY-marble`. All 9 Magisk/Zygisk modules operational, `sucompat` enabled, zero kernel update or driver mismatch warnings in KernelSU Manager.
 
 <p align="center">
   <img src="assets/ksu_home.png" width="45%" alt="KernelSU Home Screen" />
@@ -27,37 +29,37 @@
 
 ---
 
-## ✨ Особливості збірки
+## ⚙️ Technical Specifications
 
-* **Чиста сумісність з GKI 2.0 та Vendor DLKM**:
-  Конфігурація повністю узгоджена з офіційними модулями ядра Qualcomm (`/vendor_dlkm`). Вимкнено небезпечні діагностичні прапорці (`CONFIG_PAGE_OWNER`, `CONFIG_DEBUG_FS`), що змінюють розмір `struct page`, забезпечуючи бездоганне монтування та шифрування `/data`.
+* **GKI 2.0 & Vendor DLKM ABI Integrity**:
+  Kernel configuration strictly adheres to the stock LineageOS memory layout. Diagnostic flags altering `struct page` (`CONFIG_PAGE_OWNER`, `CONFIG_PAGE_PINNER`, `CONFIG_DEBUG_FS`) are omitted. This maintains binary compatibility with Qualcomm proprietary modules (`/vendor_dlkm`), ensuring operational `/data` cryptographic mounting via `qcom_scm.ko`.
 * **KernelSU-Next v3.4.1 (33345-5)**:
-  Інтеграція з форку [pershoot/KernelSU-Next](https://github.com/pershoot/KernelSU-Next) (гілка `dev-susfs`) із нативною підтримкою протоколу драйвера v3.4+, повноцінним `su` та підтримкою Android 16.
-* **SUSFS v2.3.0 (Всі 9 фіч увімкнено)**:
-  - `CONFIG_KSU_SUSFS_SUS_PATH` (Маскування шляхів)
-  - `CONFIG_KSU_SUSFS_SUS_MOUNT` (Приховання точок монтування)
-  - `CONFIG_KSU_SUSFS_SUS_KSTAT` (Підміна атрибутів kstat)
-  - `CONFIG_KSU_SUSFS_SPOOF_UNAME` (Підміна uname)
-  - `CONFIG_KSU_SUSFS_ENABLE_LOG` (Журналювання подій)
-  - `CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS` (Приховання символів ядра)
-  - `CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG` (Підміна bootconfig / cmdline)
-  - `CONFIG_KSU_SUSFS_OPEN_REDIRECT` (Перенаправлення системного виклику open)
-  - `CONFIG_KSU_SUSFS_SUS_MAP` (Захист адресного простору)
-* **Готовий AVB Hash Footer (Flags: 3)**:
-  Образ `boot.img` містить валідний AVB Footer з точним солоним SHA256 дайджестом та прапором вимкнення верифікації, що виключає вильоти в Fastboot при старті завантажувача Qualcomm ABL.
+  Direct integration from [pershoot/KernelSU-Next](https://github.com/pershoot/KernelSU-Next) (`dev-susfs` branch), implementing driver protocol v3.4+, native supercall routing, and Android 16 compatibility.
+* **SUSFS v2.3.0 (All 9 Subsystems Active)**:
+  - `CONFIG_KSU_SUSFS_SUS_PATH` (Path hiding)
+  - `CONFIG_KSU_SUSFS_SUS_MOUNT` (Mount point hiding)
+  - `CONFIG_KSU_SUSFS_SUS_KSTAT` (kstat attribute spoofing)
+  - `CONFIG_KSU_SUSFS_SPOOF_UNAME` (Uname spoofing)
+  - `CONFIG_KSU_SUSFS_ENABLE_LOG` (Kernel logging)
+  - `CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS` (Symbol concealment)
+  - `CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG` (Cmdline / bootconfig spoofing)
+  - `CONFIG_KSU_SUSFS_OPEN_REDIRECT` (Syscall open redirection)
+  - `CONFIG_KSU_SUSFS_SUS_MAP` (Address space protection)
+* **AVB Hash Footer (Flags: 3)**:
+  Pre-signed boot image containing an accurate SHA-256 payload digest and verification bypass flags, preventing execution drop to Fastboot by Qualcomm ABL.
 
 ---
 
-## 📦 Релізні файли
+## 📦 Release Artifacts
 
-Готові файли знаходяться у директорії [`output/`](output/):
+Pre-built binaries are located in [`output/`](output/):
 
-| Файл | Опис | Розмір |
+| File | Description | Size |
 |---|---|---|
-| **`AnyKernel3-marble-ksunext-susfs-LineageOS-23.2.zip`** | Прошиваний zip-архів для встановлення через OrangeFox / Recovery | ~22.8 MB |
-| **`boot-ksunext-susfs-LineageOS-23.2-marble.img`** | Готовий образ boot для прошивки через `fastboot` | 192 MB (201,326,592 B) |
+| **`AnyKernel3-marble-ksunext-susfs-LineageOS-23.2.zip`** | Flashable archive for Custom Recovery (OrangeFox / LineageOS Recovery) | ~22.8 MB |
+| **`boot-ksunext-susfs-LineageOS-23.2-marble.img`** | Standalone boot partition image with AVB footer for Fastboot | 192 MB (201,326,592 B) |
 
-### Контрольні суми SHA-256
+### SHA-256 Checksums
 ```text
 5501e483e5cda27dcd02a5589ba7886517a58a974049eb0fe92a9932eca63287  boot-ksunext-susfs-LineageOS-23.2-marble.img
 e08c0c26579a9f0995836fa79494304eb68c13c7bc67ffd6e0f5b883f30ae667  AnyKernel3-marble-ksunext-susfs-LineageOS-23.2.zip
@@ -65,111 +67,111 @@ e08c0c26579a9f0995836fa79494304eb68c13c7bc67ffd6e0f5b883f30ae667  AnyKernel3-mar
 
 ---
 
-## ⚡ Інструкція зі встановлення
+## ⚡ Installation
 
-### Спосіб 1: Через Custom Recovery (OrangeFox / TWRP) — **Рекомендовано**
-1. Скопіюйте `AnyKernel3-marble-ksunext-susfs-LineageOS-23.2.zip` на пам'ять смартфона або OTG-флешку.
-2. Перезавантажтеся в рекавері:
+### Method 1: Custom Recovery (OrangeFox / LineageOS Recovery) — Recommended
+1. Transfer `AnyKernel3-marble-ksunext-susfs-LineageOS-23.2.zip` to device storage or OTG drive.
+2. Reboot into recovery mode:
    ```bash
    adb reboot recovery
    ```
-3. Оберіть zip-архів та підтвердіть прошивку (свайп праворуч).
-4. Перезавантажте пристрій у систему (`Reboot System`).
+3. Select the zip file and confirm flashing.
+4. Reboot to system (`Reboot System`).
 
 ---
 
-### Спосіб 2: Через Fastboot
-1. Переведіть пристрій у режим Fastboot:
+### Method 2: Fastboot Flashing
+1. Reboot into Fastboot mode:
    ```bash
    adb reboot bootloader
    ```
-2. Дізнайтеся ваш поточний активний слот:
+2. Determine active slot:
    ```bash
    fastboot getvar current-slot
    ```
-3. Прошийте образ у відповідний слот:
-   * Якщо активний слот **b**:
+3. Flash the boot image to the active partition slot:
+   * Slot **b**:
      ```bash
      fastboot flash boot_b output/boot-ksunext-susfs-LineageOS-23.2-marble.img
      ```
-   * Якщо активний слот **a**:
+   * Slot **a**:
      ```bash
      fastboot flash boot_a output/boot-ksunext-susfs-LineageOS-23.2-marble.img
      ```
-4. Перезавантажте пристрій:
+4. Reboot the device:
    ```bash
    fastboot reboot
    ```
 
 ---
 
-## 🛠️ Збірка з вихідного коду (Build from Source)
+## 🛠️ Build Pipeline
 
-### 1. Вимоги
-* Linux x86_64 (Ubuntu 22.04+, Arch Linux, Debian тощо)
-* Пакет `python3`, `git`, `make`, `bc`, `bison`, `flex`, `libssl-dev`
-* Google AOSP Clang: `clang-r547379` (або новіший)
-* Утиліта `avbtool` (`sudo pacman -S android-tools` або `pip install avbtool`)
+### 1. Requirements
+* Linux x86_64 environment (Ubuntu 22.04+, Arch Linux, Debian)
+* Packages: `python3`, `git`, `make`, `bc`, `bison`, `flex`, `libssl-dev`
+* Google AOSP Clang: `clang-r547379` (or newer)
+* Android Verified Boot utility: `avbtool`
 
-### 2. Клонування та накладання патчів
+### 2. Source Tree Setup & Patching
 ```bash
 ./patch_kernel.sh
 ```
-Скрипт автоматично завантажить ядро LineageOS, підтягне гілку `dev-susfs` KernelSU-Next, накладе патчі ядра SUSFS та виправить файли складання.
+The script clones upstream LineageOS kernel sources (`lineage-23.2`), fetches `dev-susfs` branch of KernelSU-Next, applies SUSFS kernel patches, and integrates the driver into `drivers/kernelsu`.
 
-### 3. Компіляція
-Вкажіть шлях до компілятора Clang та запустіть збірку:
+### 3. Compilation
+Specify the toolchain path and execute compilation:
 ```bash
 export CLANG_DIR="$HOME/toolchains/aosp-clang/clang-r547379"
 ./build_kernel.sh
 ```
-Ядро буде зібрано з чистим конфігом `configs/marble_lineageos_23.2_ksunext_susfs.config`. Готовий файл `Image` автоматично скопіюється в `AnyKernel3/Image`.
+Builds against `configs/marble_lineageos_23.2_ksunext_susfs.config`. The compiled `Image` binary is copied to `AnyKernel3/Image`.
 
-### 4. Пакування релізних файлів
+### 4. Release Packaging
 ```bash
 ./package_kernel.sh
 ```
-Скрипт створить архів `AnyKernel3-*.zip` та перепакує стоковий boot з оновленням AVB хешів.
+Generates the flashable AnyKernel3 zip and signs the boot partition image with `avbtool`.
 
 ---
 
-## 🔍 Перевірка працездатності
+## 🔍 Runtime Verification
 
-Підключіть телефон до ПК через USB з увімкненим налагодженням та виконайте:
+Verify system and driver status via ADB shell:
 
 ```bash
 adb shell
 uname -a
-# Вивід: Linux localhost 5.10.269-gki-g490755fcc6cc #3 SMP PREEMPT ... aarch64 Toybox
+# Expected: Linux localhost 5.10.269-gki-g490755fcc6cc #3 SMP PREEMPT ... aarch64 Toybox
 
 su -v
-# Вивід: 3.4.1:KernelSU
+# Expected: 3.4.1:KernelSU
 
 ksu_susfs show version
-# Вивід: v2.3.0
+# Expected: v2.3.0
 
 ksu_susfs show enabled_features
-# Усі 9 фіч зі статусом 1
+# All 9 features reporting status: 1
 ```
 
 ---
 
-## 🤝 Подяки та контакти (Credits & Contacts)
+## 🤝 Credits & Contacts
 
 ### Credits
-* **[LineageOS Team](https://github.com/LineageOS)** — за офіційне дерево ядра та підтримку POCO F5 (`sm8450`).
-* **[pershoot](https://github.com/pershoot)** — за підтримку інтеграції KernelSU-Next та SUSFS у гілці `dev-susfs`.
-* **[simonpunk](https://gitlab.com/simonpunk)** — за створення модуля ядра SuSFS4KSU.
-* **[osm0sis](https://github.com/osm0sis)** — за інструмент пакування AnyKernel3.
-* **[tiann](https://github.com/tiann)** & **[rifsxd](https://github.com/rifsxd)** — за розробку KernelSU та KernelSU-Next.
+* **[LineageOS Team](https://github.com/LineageOS)** — Kernel source tree and device platform support (`sm8450`).
+* **[pershoot](https://github.com/pershoot)** — KernelSU-Next and SUSFS branch integration (`dev-susfs`).
+* **[simonpunk](https://gitlab.com/simonpunk)** — SuSFS4KSU kernel subsystem design and implementation.
+* **[osm0sis](https://github.com/osm0sis)** — AnyKernel3 installation backend.
+* **[tiann](https://github.com/tiann)** & **[rifsxd](https://github.com/rifsxd)** — KernelSU and KernelSU-Next development.
 
 ### Contacts & Maintainer
-* **Maintainer**: onix
+* **Maintainer**: onix ([@theonix-dev](https://github.com/theonix-dev))
 * **Email**: [onixtheoni@gmail.com](mailto:onixtheoni@gmail.com)
-* **Bug Reports & Feedback**: GitHub Issues & Pull Requests
+* **Bug Reports & Inquiries**: [GitHub Issues](https://github.com/theonix-dev/marble-kernel-ksun-susfs/issues)
 
 ---
 
-## 📄 Ліцензія (License)
+## 📄 License
 
-Цей проєкт ліцензовано на умовах **GNU General Public License v2.0** (GPL-2.0). Повний текст ліцензії доступний у файлі [LICENSE](LICENSE).
+This repository is licensed under the **GNU General Public License v2.0** (GPL-2.0). See [LICENSE](LICENSE) for full legal text.
